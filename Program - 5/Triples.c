@@ -24,6 +24,7 @@ int main()
 			j = j+1;
 			k = k+1;
 		}
+
 		res[j] = '\0';
 		k = 0;
 		j++;
@@ -92,7 +93,7 @@ int main()
 					printf("STORE R1,%s\n",res);
 					break;
 
-				default: printf("\n Invalid statement\n");
+				default: printf("\n Statement Invalid\n");
 			}
 		}
 	}
