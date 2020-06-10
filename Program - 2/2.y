@@ -8,7 +8,7 @@
 %token A B
 
 %%
-input:S'\n' {printf("String accepted\n"); exit(0);}
+input:S'\n' {printf("String has been accepted\n"); exit(0);}
 S:A S1 B|B
 S1:;|A S1
 %%
