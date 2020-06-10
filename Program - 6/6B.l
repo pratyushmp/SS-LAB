@@ -1,13 +1,13 @@
 %{
     #include<stdio.h>
-    #include "ytab.h"
-    extern int yylavl;
+    #include "y.tab.h"
+    extern int yylval;
 %}
 
 %%
-[+-*/=<>]       {printf("operator = %s", yytext); return OP;}
-[0-9]+          {yylavl = atoi(yytext); printf("The no of digit is %d\n", yylavl); return DIGIT;}
-int|char|bool|float|void    {printf("Keyword is %s", yytext); return KEY;}
+[+|-|*|/|=|<|>]       {printf("operator = %s", yytext); return OP;}
+[0-9]+          {yylval = atoi(yytext); printf("The no of digit is %d\n", yylval); return DIGIT;}
+int|char|bool|float|void|for|do|while|if|else|return|void   {printf("Keyword is %s", yytext); return KEY;}
 [a-zA-Z0-9]+                {printf("Identifier %s\n", yytext); return ID;}
 %%
 
