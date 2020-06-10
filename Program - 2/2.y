@@ -1,6 +1,8 @@
 %{
     #include<stdio.h>
     #include<stdlib.h>
+    int yylex();
+    int yyerror();
 %}
 
 %token A B
