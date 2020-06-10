@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 
+
 /*
  FIRST(A)={a}
  FIRST(B)={b#}
@@ -8,170 +9,193 @@
  FOLLOW(B)={a}
  
  Parser Table Entry
+ 
  M[A,a]=A->aBa
  M[B,a]=B->#
  M[B,b]=B->bB
  */
 
-struct FT 
+struct FT
 {
 	char nonT;
 	char set[20];
 };
-
-struct FT first[10], follow[10];
-char parser_table[2][3][10];							
-char termminal_list[3] = {"ab$"};
-int n;
+typedef struct FT FIRST_FOLLOW_SET;
+FIRST_FOLLOW_SET first[10],follow[10];
+char Parser_Table[2][3][10];							
+char termminal_list[3]={"ab$"};
+int n; 
 char stack[50];
-int top = -1;
-
-char* strrev(char *str) 
+int top=-1;
+char *strrev(char *str)
 {
-    int i = 0, j = strlen(str) - 1;
-    char tmp;
-    while (i < j)
+    int i = strlen(str) - 1, j = 0;
+
+    char ch;
+    while (i > j)
     {
-        tmp = str[i];
+        ch = str[i];
         str[i] = str[j];
-        str[j] = tmp;
-        i++;
-        j--;
+        str[j] = ch;
+        i--;
+        j++;
     }
     return str;
 }
-
-int getFollowIndex(char x) 
+int getFollowIndex(char x)
 {
 	int i;
-	for(i=0; i<n; i++) 
+	for(i=0;i<n;i++)
 	{
-		if(follow[i].nonT == x)
+		if(follow[i].nonT==x)
 			break;
 	}
 	return i;
 }
-
-int getTerminalIndex(char x) 
+int getTerminalIndex(char x)
 {
 	int i;
-	for(i=0; i<strlen(termminal_list); i++) 
+	for(i=0;i<strlen(termminal_list);i++)
 	{
-		if(termminal_list[i] == x)
+		if(termminal_list[i]==x)
 			break;
 	}
 	return i;
 }
-
-void push(char x) 
+void push(char x)
 {
-	stack[++top] = x;
+	stack[++top]=x;
 }
-
-void pop() 
+void pop()
 {
-	stack[top] = '\0';
+	stack[top]='\0';
 	top--;
 }
-
-void check_input(char expr[30]) 
+void check_input(char expr[30],int n_expr)
 {
 	int i,j,row,col;
-	char prod[20], *token, ch, StackTop, temp[2], rprod[20];
-	temp[1] = '\0';
-	for(i=0; expr[i] != '$';) 
+	char prod[20],*token,ch,StackTop,temp[2],rprod[20];
+	temp[1]='\0';
+	for(i=0;expr[i]!='$';)
 	{
-		ch = expr[i];
-		StackTop = stack[top];
-		temp[0] = StackTop;
-        if(strstr(termminal_list,temp) != NULL || StackTop == '$') 
+		ch=expr[i];
+		StackTop=stack[top];
+		temp[0]=StackTop;
+		if(strstr(termminal_list,temp)!=NULL || StackTop =='$' )
 		{
-			if(strstr(termminal_list,temp) != NULL) 
+			if(strstr(termminal_list,temp)!=NULL )
 			{
 				pop();
 				i++;
 			}
-		} 
-		else 
-		{
-			if(strstr(termminal_list,temp) == NULL) 
+			else
 			{
-				row = getFollowIndex(StackTop);
-				col = getTerminalIndex(ch);
-				strcpy(prod, parser_table[row][col]);
-                printf("\nM[%d,%d]  M[%c,%c] = %s",row,col,StackTop,ch,prod);
-                strcpy(rprod,strrev(prod));
-				token = strtok(rprod,">");
-				if(strstr(rprod,"#") != NULL) 
+				printf("\nError in the Stack Symbol Not Matching");
+				printf("\n%s Not Accepted",expr);
+				return;
+			}
+		}
+		else
+		{
+			if(strstr(termminal_list,temp)==NULL)
+			{
+				row=getFollowIndex(StackTop);
+				col=getTerminalIndex(ch);
+				strcpy(prod,Parser_Table[row][col]);
+				printf("\nM[%d,%d]  M[%c,%c] = %s",row,col,StackTop,ch,prod);
+				if(strstr(prod,"err")!=NULL)
 				{
-					pop();
-				} 
-				else 
+					printf("\nError : No Entry in the Table");
+					printf("\n%s Not Accepted",expr);
+					return;
+				}
+				else
 				{
-					pop();
-					for(j=0;j<strlen(token);j++)
-						push(token[j]);
+					strcpy(rprod,strrev(prod));
+					token=strtok(rprod,">");
+					if(strstr(rprod,"#")!=NULL)
+					{
+						pop();
+					}
+					else
+					{
+						pop();
+						for(j=0;j<strlen(token);j++)
+							push(token[j]);
+					}
 				}
 			}
 		}
 	}
-	
-    if(expr[i] == stack[top])
-		printf("\n ch = %c StackTop = %c  %s is Accepted\n",expr[i],stack[top],expr);
+	if(expr[i]==stack[top])
+		printf("\n ch = %c StackTop = %c  %s is Accepted",expr[i],stack[top],expr);
 	else
 		printf("\n ch = %c StackTop = %c  %s is Not Accepted",expr[i],stack[top],expr);
 }
-
-void init() 
+void init()
 {
-	stack[0] = '\0';
-	top = -1;
+	stack[0]='\0';
+	top=-1;
 }
-
-int main() 
+int main()
 {
 	char production[10][20],Ind_prod[30][20],inputString[30];
-	int i,j,ch,n_Ind = 0;
+	int i,j,n_Ind=0,ch;
 	char t,T;
-    n = 2;
-    fflush(stdin);
-    for(i=0;i<n;i++) 
+	printf("\n Enter the number of production\n");
+	scanf("%d",&n);
+	fflush(stdin);
+	for(i=0;i<n;i++)
 	{
-		printf("Enter production %d: ",i);
-		gets(production[i]);
+		printf("Enter the %d production\t",i);
+		scanf("%s",production[i]);
 		fflush(stdin);
 	}
-	printf("\nFirst Set\n");
+	printf("\n The production entered\t");
+	for(i=0;i<n;i++)
+		printf("\n %s",production[i]);
+
+	printf("\n First Set\n");
 	for (i=0;i<n;i++)
 	{
-		first[i].nonT = production[i][0];
-		printf("Enter First(%c): ",first[i].nonT);
-		gets(first[i].set);
+		first[i].nonT=production[i][0];
+		printf("Enter First(%c)\t",first[i].nonT);
+		scanf("%s",first[i].set);
 		fflush(stdin);
 	}
-	printf("\nFollow Set\n");
-    for (i=0; i<n; i++) 
+	printf("\n Follow Set\n");
+	for (i=0;i<n;i++)
 	{
-		follow[i].nonT = first[i].nonT;
-		printf("Enter Follow(%c): ",follow[i].nonT);
-		gets(follow[i].set);
+		follow[i].nonT=first[i].nonT;
+		printf("Enter Follow(%c)\t",follow[i].nonT);
+		scanf("%s",follow[i].set);
 		fflush(stdin);
 	}
-    printf("\nIf no entry, enter err\n");
-    for(i=0;i<2;i++)
-	    for (j=0;j<3;j++) 
-		{
-		    T = first[i].nonT;
-		    t = termminal_list[j];
-		    printf("M[%d,%d] M[%c,%c] = ",i,j,T,t) ;
-		    gets(parser_table[i][j]);
-		    fflush(stdin);
-	    }
-	init();
-	push('$');
-	push(production[0][0]);
-	printf("\nStack %s",stack);
-	printf("\nEnter the input \t");
-	gets(inputString);
-    check_input(inputString);
+	printf("\n If no entry please enter err in the table\n");
+	for(i=0;i<2;i++)
+	for (j=0;j<3;j++)
+	{
+		T=first[i].nonT;
+		t=termminal_list[j];
+		printf("M[%d,%d] M[%c,%c]=\t",i,j,T,t) ;
+		scanf("%s",Parser_Table[i][j]);
+		fflush(stdin);
+	}
+	while(1)
+	{
+		init();
+		push('$');
+		push(production[0][0]);
+		printf("\nStack %s",stack);
+		printf("\nEnter the input \t");
+		scanf("%s",inputString);
+		strcat(inputString,"$");
+		printf("InputString %s",inputString);
+		check_input(inputString,strlen(inputString));
+		printf("\n Press 1 to Continue 0 to Exit\t");
+		scanf("%d",&ch);
+		fflush(stdin);
+		if(ch==0)
+			break;
+	}
 }
