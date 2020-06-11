@@ -7,7 +7,7 @@
 [0-9]+	{id++;
 	 printf("The identifier is %s\n",yytext);
 	}
-[+*]	{optr++;
+[+|-|*|/]	{optr++;
 	 printf("The operator is %s\n",yytext);
 	}
 [(]	p++;
