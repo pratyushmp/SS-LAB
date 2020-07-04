@@ -8,8 +8,8 @@
 	 printf("The identifier is %s\n",yytext);
 	}
 [+|-|*|/]	{optr++;
-	 printf("The operator is %s\n",yytext);
-	}
+	 	printf("The operator is %s\n",yytext);
+		}
 [(]	p++;
 [)]	p--;
 %%
